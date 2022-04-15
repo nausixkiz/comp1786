@@ -1,10 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:irate/screens/event_create_screen.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+Database? database;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  database = await openDatabase(
+    join(await getDatabasesPath(), 'database.db'),
+    onCreate: (db, version) {
+      // Run the CREATE TABLE statement on the database.
+      return db.execute(
+        'CREATE TABLE events(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, activityName TEXT NOT NULL, location TEXT NULL DEFAULT NULL, dateHeld DATE NOT NULL, timeOfAttending TIME NULL DEFAULT NULL, nameOfReporter TEXT NOT NULL)',
+      );
+    },
+    version: 1,
+  );
+
   runApp(const MyApp());
 }
 
@@ -18,7 +35,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: const MyHomePage(title: 'i-Rate Homepage'),
+      // home: const MyHomePage(title: 'i-Rate Homepage'),
       home: const EventCreateScreen(),
     );
   }
